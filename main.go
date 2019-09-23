@@ -11,7 +11,7 @@ import (
 	"github.com/01-edu/z01"
 )
 
-//lightest to darkest for the acsii
+//darkest to lightest for the acsii
 const asciiBrightness = "`^\",:;Il!i~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"
 
 //slice for the brightness for the acsii
