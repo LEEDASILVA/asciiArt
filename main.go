@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"image"
 	"image/jpeg"
 	"log"
@@ -12,10 +11,6 @@ import (
 	"github.com/01-edu/z01"
 )
 
-type pixel struct {
-	r, g, b uint32
-}
-
 //lightest to darkest for the acsii
 const asciiBrightness = "`^\",:;Il!i~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"
 
@@ -25,21 +20,16 @@ var (
 	boundX, boundY int
 )
 
-func getImage(img string) [][]pixel {
-	//create a slice of slices for the pixels (bidimentional slice)
-	var images [][]pixel
-
+func getImage(img string) {
 	//Walk walks the file tree using the path, start from the img and apply the function
 	filepath.Walk(img, func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() {
 			return nil
 		}
 		image := loadImage(path)
-		pixels := getPixels(image)
-		images = append(images, pixels)
+		getPixels(image)
 		return nil
 	})
-	return images
 }
 
 //decode the image and returns it
@@ -60,17 +50,15 @@ func loadImage(filename string) image.Image {
 }
 
 //return a slice of pixels, fetchs all the pixels
-func getPixels(img image.Image) []pixel {
+func getPixels(img image.Image) {
 	//fetch the bound of the image to use the height and the width of the image
 	bound := img.Bounds()
 	boundX = bound.Dx()
 	boundY = bound.Dy()
 
-	fmt.Printf("amout of pixels: %d x %d\n", bound.Dx(), bound.Dy())
-	dime := bound.Dx() * bound.Dy()
-
+	//fmt.Printf("amout of pixels: %d x %d\n", bound.Dx(), bound.Dy())
 	//the length/dimention of all the pixels in the image
-	pixels := make([]pixel, dime)
+	dime := bound.Dx() * bound.Dy()
 
 	for i := 0; i < dime; i++ {
 		//the x is a pixel, if the image as 480*503 it will have 241440 pixels
@@ -86,24 +74,21 @@ func getPixels(img image.Image) []pixel {
 		average := math.Sqrt(0.299*math.Pow(float64(r), 2) + 0.587*math.Pow(float64(g), 2) + 0.114*math.Pow(float64(b), 2)) // <- this is the best way to get the brightness
 
 		brightness = append(brightness, uint32(average/257))
-		pixels[i].r = r
-		pixels[i].g = g
-		pixels[i].b = b
 	}
-	return pixels
 }
 
 func main() {
 	getImage("b.jpg")
 	br := []rune(asciiBrightness)
 	//mapping the acsii with the brigthness using formula
+	//this will be the middle of the brightness slice and the middle of the asciiBrightness slice
 	baseBri := 127
 	baseChar := 32
 
 	for i := 0; i < len(brightness); i++ {
 		x := i % boundX
 		if x == 0 {
-			fmt.Println()
+			z01.PrintRune('\n')
 		}
 		formula := (baseChar * int(brightness[i])) / baseBri
 		z01.PrintRune(br[formula])
