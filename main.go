@@ -108,16 +108,4 @@ func main() {
 		formula := (baseChar * int(brightness[i])) / baseBri
 		z01.PrintRune(br[formula])
 	}
-
-	/*
-		//the slice of pixels
-		for _, img := range images {
-			//each pixel in the slice of pixels
-			for j, pixel := range img {
-				fmt.Println("pixel", j, "r g b : ", pixel)
-				if j == 10 {
-					break
-				}
-			}
-		}*/
 }
