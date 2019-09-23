@@ -94,7 +94,7 @@ func getPixels(img image.Image) []pixel {
 }
 
 func main() {
-	getImage("Homer-simpson.jpg")
+	getImage("b.jpg")
 	br := []rune(asciiBrightness)
 	//mapping the acsii with the brigthness using formula
 	baseBri := 127
