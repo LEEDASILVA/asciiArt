@@ -16,8 +16,9 @@ const asciiBrightness = "`^\",:;Il!i~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkh
 
 //slice for the brightness for the acsii
 var (
-	brightness     []uint32
-	boundX, boundY int
+	brightness []uint32
+	boundX     int
+	arg        map[string]bool
 )
 
 func getImage(img string) {
@@ -54,7 +55,6 @@ func getPixels(img image.Image) {
 	//fetch the bound of the image to use the height and the width of the image
 	bound := img.Bounds()
 	boundX = bound.Dx()
-	boundY = bound.Dy()
 
 	//fmt.Printf("amout of pixels: %d x %d\n", bound.Dx(), bound.Dy())
 	//the length/dimention of all the pixels in the image
@@ -70,18 +70,45 @@ func getPixels(img image.Image) {
 		// At returns the color of the pixel at (x, y) of the image
 		r, g, b, _ := img.At(x, y).RGBA()
 
-		//average := (r + g + b) / 3
+		//average := (r + g + b) / 3 <- other way but not that good
 		average := math.Sqrt(0.299*math.Pow(float64(r), 2) + 0.587*math.Pow(float64(g), 2) + 0.114*math.Pow(float64(b), 2)) // <- this is the best way to get the brightness
 
 		brightness = append(brightness, uint32(average/257))
 	}
 }
 
+func argVerification(baseBri, baseChar, i int) int {
+	for k, v := range arg {
+		if v == true && k == "--up" {
+			return (baseChar * int(brightness[len(brightness)-1-i])) / baseBri
+		} else if v == true && k == "--reverseColor" {
+			//fmt.Println(((baseChar*baseBri)/int(brightness[i]) - 6))
+			return ((baseChar*baseBri)/int(brightness[i]) - 6)
+		} else if v == true && k == "--color" {
+
+		}
+	}
+	return (baseChar * int(brightness[i])) / baseBri
+}
+
 func main() {
+	if len(os.Args) >= 2 {
+		if arg == nil {
+			arg = make(map[string]bool)
+			arg["--up"] = false
+			arg["--reverse"] = false
+			arg["--color"] = false
+		}
+		for i := 1; i < len(os.Args); i++ {
+			arg[os.Args[i]] = true
+		}
+	}
+
 	getImage("b.jpg")
 	br := []rune(asciiBrightness)
 	//mapping the acsii with the brigthness using formula
 	//this will be the middle of the brightness slice and the middle of the asciiBrightness slice
+	var formula int
 	baseBri := 127
 	baseChar := 32
 
@@ -90,7 +117,8 @@ func main() {
 		if x == 0 {
 			z01.PrintRune('\n')
 		}
-		formula := (baseChar * int(brightness[i])) / baseBri
+		formula = argVerification(baseBri, baseChar, i)
+		z01.PrintRune(br[formula])
 		z01.PrintRune(br[formula])
 	}
 }
