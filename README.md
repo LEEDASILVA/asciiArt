@@ -16,7 +16,7 @@
 - it has 4 options, being:
     - `--up` this will inverte the image
     - `--reverseColor` this will reverse the color of the image, chosing the rigth brightness
-    - `--color` + `blue` this will print the image in the color chosen by you, bing `blue`, `red`,`green`,`purple` and `brown`.
+    - `--color` + `blue` this will print the image in the color chosen by you, being `blue`, `red`,`green`,`purple` and `brown`.
 
 # to optimise :
 
