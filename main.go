@@ -4,18 +4,13 @@ import (
 	"fmt"
 	"image"
 	"image/jpeg"
-	"log"
 	"math"
 	"os"
 	"path/filepath"
-
-	"github.com/01-edu/z01"
 )
 
 //darkest to lightest for the acsii
-const (
-	asciiBrightness = "`^\",:;Il!i~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"
-)
+const asciiBrightness = "`^\",:;Il!i~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"
 
 //slice for the brightness for the acsii
 var (
@@ -42,14 +37,18 @@ func loadImage(filename string) image.Image {
 	f, err := os.Open(filename)
 
 	if err != nil {
-		log.Fatal(err)
+		//just to remove the package log
+		fmt.Println(err.Error())
+		os.Exit(1)
 	}
 	//it will exetude this if the function finally returns the statment
 	defer f.Close()
 
 	img, err := jpeg.Decode(f)
 	if err != nil {
-		log.Fatal(err)
+		//just to remove the package log
+		fmt.Println(err.Error())
+		os.Exit(1)
 	}
 	return img
 }
@@ -74,7 +73,7 @@ func getPixels(img image.Image) {
 		// At returns the color of the pixel at (x, y) of the image
 		r, g, b, _ := img.At(x, y).RGBA()
 
-		//average := (r + g + b) / 3 <- other way but not that good
+		//average := (r + g + b) / 3 <- other way but not that good, there are alot of ways to do it.
 		average := math.Sqrt(0.299*math.Pow(float64(r), 2) + 0.587*math.Pow(float64(g), 2) + 0.114*math.Pow(float64(b), 2)) // <- this is the best way to get the brightness
 
 		brightness = append(brightness, uint32(average/257))
@@ -90,8 +89,8 @@ func colors() {
 	color["green"] = "\033[0;32m"
 	color["purple"] = "\033[0;35m"
 	color["brown"] = "\033[0;33m"
-
 }
+
 func reverseColor(value int) int {
 	a := 33
 	b := 32
@@ -126,6 +125,7 @@ func main() {
 			arg[os.Args[i]] = true
 		}
 	}
+
 	getImage("b.jpg")
 	br := []rune(asciiBrightness)
 	colorArg := os.Args[len(os.Args)-1]
@@ -137,15 +137,15 @@ func main() {
 	for i := 0; i < len(brightness); i++ {
 		x := i % boundX
 		if x == 0 {
-			z01.PrintRune('\n')
+			fmt.Print('\n')
 		}
 		formula, ok := argVerification(baseBri, baseChar, i)
 		if ok == true {
 			fmt.Print(color[colorArg] + string(br[formula]))
 			fmt.Print(color[colorArg] + string(br[formula]))
 		} else {
-			z01.PrintRune(br[formula])
-			z01.PrintRune(br[formula])
+			fmt.Print(br[formula])
+			fmt.Print(br[formula])
 		}
 	}
 }
