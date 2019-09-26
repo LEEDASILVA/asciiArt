@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"image"
 	"image/jpeg"
 	"log"
@@ -12,13 +13,16 @@ import (
 )
 
 //darkest to lightest for the acsii
-const asciiBrightness = "`^\",:;Il!i~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"
+const (
+	asciiBrightness = "`^\",:;Il!i~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"
+)
 
 //slice for the brightness for the acsii
 var (
 	brightness []uint32
 	boundX     int
 	arg        map[string]bool
+	color      map[string]string
 )
 
 func getImage(img string) {
@@ -77,18 +81,37 @@ func getPixels(img image.Image) {
 	}
 }
 
-func argVerification(baseBri, baseChar, i int) int {
+func colors() {
+	if color == nil {
+		color = make(map[string]string)
+	}
+	color["blue"] = "\033[0;34m"
+	color["red"] = "\033[0;31m"
+	color["green"] = "\033[0;32m"
+	color["purple"] = "\033[0;35m"
+	color["brown"] = "\033[0;33m"
+
+}
+func reverseColor(value int) int {
+	a := 33
+	b := 32
+	valueReverse := (value * b) / a
+	return valueReverse
+}
+
+func argVerification(baseBri, baseChar, i int) (int, bool) {
 	for k, v := range arg {
 		if v == true && k == "--up" {
-			return (baseChar * int(brightness[len(brightness)-1-i])) / baseBri
+			return (baseChar * int(brightness[len(brightness)-1-i])) / baseBri, false
 		} else if v == true && k == "--reverseColor" {
-			//fmt.Println(((baseChar*baseBri)/int(brightness[i]) - 6))
-			return ((baseChar*baseBri)/int(brightness[i]) - 6)
+			value := (baseChar * int(brightness[i])) / baseBri
+			return reverseColor(value), false
 		} else if v == true && k == "--color" {
-
+			colors()
+			return (baseChar * int(brightness[i])) / baseBri, true
 		}
 	}
-	return (baseChar * int(brightness[i])) / baseBri
+	return (baseChar * int(brightness[i])) / baseBri, false
 }
 
 func main() {
@@ -96,19 +119,18 @@ func main() {
 		if arg == nil {
 			arg = make(map[string]bool)
 			arg["--up"] = false
-			arg["--reverse"] = false
+			arg["--reverseColor"] = false
 			arg["--color"] = false
 		}
 		for i := 1; i < len(os.Args); i++ {
 			arg[os.Args[i]] = true
 		}
 	}
-
 	getImage("b.jpg")
 	br := []rune(asciiBrightness)
+	colorArg := os.Args[len(os.Args)-1]
 	//mapping the acsii with the brigthness using formula
 	//this will be the middle of the brightness slice and the middle of the asciiBrightness slice
-	var formula int
 	baseBri := 127
 	baseChar := 32
 
@@ -117,8 +139,13 @@ func main() {
 		if x == 0 {
 			z01.PrintRune('\n')
 		}
-		formula = argVerification(baseBri, baseChar, i)
-		z01.PrintRune(br[formula])
-		z01.PrintRune(br[formula])
+		formula, ok := argVerification(baseBri, baseChar, i)
+		if ok == true {
+			fmt.Print(color[colorArg] + string(br[formula]))
+			fmt.Print(color[colorArg] + string(br[formula]))
+		} else {
+			z01.PrintRune(br[formula])
+			z01.PrintRune(br[formula])
+		}
 	}
 }
