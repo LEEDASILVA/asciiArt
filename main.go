@@ -91,9 +91,9 @@ func colors() {
 	color["brown"] = "\033[0;33m"
 }
 
-func reverseColor(value int) int {
-	a := 33
-	b := 32
+func reverse(value int) int {
+	a := 34
+	b := 33
 	valueReverse := (value * b) / a
 	return valueReverse
 }
@@ -104,10 +104,12 @@ func argVerification(baseBri, baseChar, i int) (int, bool) {
 			return (baseChar * int(brightness[len(brightness)-1-i])) / baseBri, false
 		} else if v == true && k == "--reverseColor" {
 			value := (baseChar * int(brightness[i])) / baseBri
-			return reverseColor(value), false
+			return reverse(value), false
 		} else if v == true && k == "--color" {
 			colors()
 			return (baseChar * int(brightness[i])) / baseBri, true
+		} else {
+			return (baseChar * int(brightness[i])) / baseBri, false
 		}
 	}
 	return (baseChar * int(brightness[i])) / baseBri, false
@@ -137,15 +139,16 @@ func main() {
 	for i := 0; i < len(brightness); i++ {
 		x := i % boundX
 		if x == 0 {
-			fmt.Print('\n')
+			fmt.Println()
 		}
 		formula, ok := argVerification(baseBri, baseChar, i)
-		if ok == true {
+		if ok {
 			fmt.Print(color[colorArg] + string(br[formula]))
 			fmt.Print(color[colorArg] + string(br[formula]))
 		} else {
-			fmt.Print(br[formula])
-			fmt.Print(br[formula])
+			//fmt.Println(br[formula], formula)
+			fmt.Print(string(br[formula]))
+			fmt.Print(string(br[formula]))
 		}
 	}
 }
